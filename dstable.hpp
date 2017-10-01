@@ -355,12 +355,7 @@ void dsTABLE<VALUE_TYPE>::Delete (ITERATOR & it)
    if (p->prev != NULL) {
       p->prev->next = p->next;
    } else {
-      for (size_t i = 0; i < capacity; i++) {
-         if (table[i] == p) {
-            table[i] = NULL;
-            break;
-         }
-      }
+      table[it.index] = NULL;
    }
 
    free(p);
