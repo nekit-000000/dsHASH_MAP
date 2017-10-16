@@ -25,7 +25,6 @@ static void BM_MapFindTest (benchmark::State & state) {
 
 
 static void BM_HashMapFindTest(benchmark::State & state) {
-   // Minimize the collizion number
    dsHASH_MAP<int, int> hashMap(state.range(0) * 2);
 
    int size = state.range(0);
@@ -129,8 +128,8 @@ BENCHMARK(BM_HashMapInsertNWithoutRehashTest)->RangeMultiplier(2)->Range(1 << 8,
 BENCHMARK(BM_HashMapInsertNWithRehashTest)->RangeMultiplier(2)->Range(1 << 8, 1 << 18)->Complexity();
 
 // Delete element tests
-BENCHMARK(BM_MapDeleteTest)->RangeMultiplier(2)->Range(1 << 8, 1 << 19)->Complexity();
-BENCHMARK(BM_HashMapDeleteTest)->RangeMultiplier(2)->Range(1 << 8, 1 << 19)->Complexity();
+//BENCHMARK(BM_MapDeleteTest)->RangeMultiplier(2)->Range(1 << 8, 1 << 18)->Complexity(); // Not working properly yet (O(1))
+BENCHMARK(BM_HashMapDeleteTest)->RangeMultiplier(2)->Range(1 << 8, 1 << 18)->Complexity();
 
 
 /* END OF "comparison.cpp" FILE */
