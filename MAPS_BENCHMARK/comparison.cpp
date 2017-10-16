@@ -128,7 +128,7 @@ BENCHMARK(BM_HashMapInsertNWithoutRehashTest)->RangeMultiplier(2)->Range(1 << 8,
 BENCHMARK(BM_HashMapInsertNWithRehashTest)->RangeMultiplier(2)->Range(1 << 8, 1 << 18)->Complexity();
 
 // Delete element tests
-//BENCHMARK(BM_MapDeleteTest)->RangeMultiplier(2)->Range(1 << 8, 1 << 18)->Complexity(); // Not working properly yet (O(1))
+//BENCHMARK(BM_MapDeleteTest)->RangeMultiplier(2)->Range(1 << 8, 1 << 18)->Complexity();  // Not working properly yet (O(1))
 BENCHMARK(BM_HashMapDeleteTest)->RangeMultiplier(2)->Range(1 << 8, 1 << 18)->Complexity();
 
 
