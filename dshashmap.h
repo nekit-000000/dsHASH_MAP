@@ -39,11 +39,11 @@ public:
    void Clear                       (void);
    void Erase                       (const KEY_TYPE & key);
    bool Empty                       (void) const;
-   size_t Size                      (void) const { return mapTable.size; }
+   size_t Size                      (void) const { return mapTable.Size(); }
 
-   float LoadFactor                 (void) const;
-   void MaxLoadFactor               (float z);
-   float MaxLoadFactor              (void) const { return maxLoadFactor; }
+   float GetLoadFactor              (void) const;
+   void SetMaxLoadFactor            (float z);
+   float GetMaxLoadFactor           (void) const { return maxLoadFactor; }
 
 private:
    void Rehash     (void);

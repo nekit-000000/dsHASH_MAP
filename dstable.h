@@ -51,16 +51,18 @@ public:
    CONST_ITERATOR Begin (void) const;
    CONST_ITERATOR End   (void) const;
 
-   ITERATOR Insert        (const VALUE_TYPE & data, const int & index);
-   ITERATOR Get           (const int & index);
-   CONST_ITERATOR Get     (const int & index) const;
-   ITERATOR GetLast       (const int & index);
-   CONST_ITERATOR GetLast (const int & index) const;
+   ITERATOR Insert        (const VALUE_TYPE & data, size_t index);
+   ITERATOR Get           (size_t index);
+   CONST_ITERATOR Get     (size_t index) const;
+   ITERATOR GetLast       (size_t index);
+   CONST_ITERATOR GetLast (size_t index) const;
    ITERATOR Find          (const VALUE_TYPE & data);
    CONST_ITERATOR Find    (const VALUE_TYPE & data) const;
    void Clear             (void);
    void Delete            (ITERATOR & it);
    void Delete            (const VALUE_TYPE & data);
+   bool NextIsNull        (CONST_ITERATOR & it) const;
+   bool NextIsNull        (ITERATOR & it) const;
 
    size_t Capacity        (void) const { return capacity; }
    size_t Size            (void) const { return size; }

@@ -12,7 +12,7 @@ class TABLE_TEST : public testing::Test,
       size = GetParam();
       testTable = dsTABLE<int>(size);
       for (int i = 0; i < size; i++) {
-         testTable.Insert(i, 0);
+         testTable.Insert(i, i);
       }
    }
 
@@ -32,7 +32,14 @@ TEST_P (TABLE_TEST, SizeAfterInsertion)
 }
 
 
-TEST (MapSizeTest, IsEmptyInitially)
+TEST_P (TABLE_TEST, GetTestWrongIndex)
+{
+   auto it = testTable.Get(size);
+   EXPECT_EQ(it, testTable.End());
+}
+
+
+TEST (TableSizeTest, IsEmptyInitially)
 {
    dsTABLE<int> testTable;
    EXPECT_EQ(0, testTable.Size());
@@ -73,12 +80,12 @@ TEST_P(TABLE_TEST, ErasesCorrectly)
    }
 }
 
+
 TEST_P (TABLE_TEST, ClearTestIfNotEmpty)
 {
    testTable.Clear();
    EXPECT_EQ(testTable.Begin(), testTable.End());
 }
-
 
 
 TEST_P (TABLE_TEST, CopyTest)
@@ -115,7 +122,7 @@ TEST_P(TABLE_TEST, MoveCopyTest)
 }
 
 
-TEST (IteratorTest, PassesAllVallues)
+TEST (PrefixIteratorTest, PassesAllVallues)
 {
    dsTABLE<int> testTable;
 
@@ -125,6 +132,28 @@ TEST (IteratorTest, PassesAllVallues)
 
    int iterCnt = 0;
    for (auto it = testTable.Begin(); it != testTable.End(); ++it) {
+      (*it)++;
+      iterCnt++;
+   }
+
+   EXPECT_EQ(testTable.Size(), iterCnt);
+
+   for (auto it = testTable.Begin(); it != testTable.End(); ++it) {
+      EXPECT_EQ(*it, 1);
+   }
+}
+
+
+TEST (PostfixIteratorTest, PassesAllVallues)
+{
+   dsTABLE<int> testTable;
+
+   for (int i = 0; i < 1000; i++) {
+      testTable.Insert(0, i);
+   }
+
+   int iterCnt = 0;
+   for (auto it = testTable.Begin(); it != testTable.End(); it++) {
       (*it)++;
       iterCnt++;
    }

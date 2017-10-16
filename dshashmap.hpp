@@ -74,7 +74,7 @@ dsHASH_MAP<KEY_TYPE, VALUE_TYPE, HASH>::~dsHASH_MAP (void)
 
 
 template <typename KEY_TYPE, typename VALUE_TYPE, typename HASH>
-void dsHASH_MAP<KEY_TYPE, VALUE_TYPE, HASH>::MaxLoadFactor (float z)
+void dsHASH_MAP<KEY_TYPE, VALUE_TYPE, HASH>::SetMaxLoadFactor (float z)
 {
    maxLoadFactor = z;
 }
@@ -83,7 +83,7 @@ void dsHASH_MAP<KEY_TYPE, VALUE_TYPE, HASH>::MaxLoadFactor (float z)
 template <typename KEY_TYPE, typename VALUE_TYPE, typename HASH>
 bool dsHASH_MAP<KEY_TYPE, VALUE_TYPE, HASH>::Empty (void) const
 {
-   return size == 0;
+   return Size() == 0;
 }
 
 
@@ -93,17 +93,16 @@ typename dsHASH_MAP<KEY_TYPE, VALUE_TYPE, HASH>::CONST_ITERATOR
 {
    size_t index = GetIndex(key);
    CONST_ITERATOR it = mapTable.Get(index);
-   ITERATOR itEnd = mapTable.GetLast(index);
 
-   if (it == End()) {
+   if (it == End() || it->first == key) {
       return it;
    }
 
-   while (it != itEnd && it->first != key) {
+   while (!mapTable.NextIsNull(it)) {
       it++;
    }
 
-   if (it == itEnd) {
+   if (mapTable.NextIsNull(it) && it->first != key) {
       return End();
    }
    return it;
@@ -116,17 +115,16 @@ typename dsHASH_MAP<KEY_TYPE, VALUE_TYPE, HASH>::ITERATOR
 {
    size_t index = GetIndex(key);
    ITERATOR it = mapTable.Get(index);
-   ITERATOR itEnd = mapTable.GetLast(index);
 
-   if (it == End()) {
+   if (it == End() || it->first == key) {
       return it;
    }
 
-   while (it != itEnd && it->first != key) {
+   while (!mapTable.NextIsNull(it)) {
       it++;
    }
 
-   if (it == itEnd) {
+   if (mapTable.NextIsNull(it) && it->first != key) {
       return End();
    }
    return it;
@@ -166,6 +164,12 @@ void dsHASH_MAP<KEY_TYPE, VALUE_TYPE, HASH>::Rehash (void)
 
       if (it != End()) {
          newTable.Insert(*it, hash(it->first) % newCapacity);
+         if (it != mapTable.GetLast(i)) {
+            while (it != mapTable.GetLast(i)) {
+               it++;
+               newTable.Insert(*it, hash(it->first) % newCapacity);
+            }
+         }
       }
    }
 
@@ -178,7 +182,7 @@ std::pair<typename dsHASH_MAP<KEY_TYPE, VALUE_TYPE, HASH>::ITERATOR, bool>
    dsHASH_MAP<KEY_TYPE, VALUE_TYPE, HASH>::Insert (const ELEM_TYPE & data)
 {
    // check if we need to incrase the capacity
-   if (LoadFactor() >= maxLoadFactor) {
+   if (GetLoadFactor() >= maxLoadFactor) {
       Rehash();
    }
 
@@ -204,7 +208,7 @@ VALUE_TYPE & dsHASH_MAP<KEY_TYPE, VALUE_TYPE, HASH>::operator[] (const KEY_TYPE 
       insertPair.first = key;
 
       // check if we need to incrase the capacity
-      if (LoadFactor() >= maxLoadFactor) {
+      if (GetLoadFactor() >= maxLoadFactor) {
          Rehash();
       }
 
@@ -216,7 +220,7 @@ VALUE_TYPE & dsHASH_MAP<KEY_TYPE, VALUE_TYPE, HASH>::operator[] (const KEY_TYPE 
 
 
 template <typename KEY_TYPE, typename VALUE_TYPE, typename HASH>
-float dsHASH_MAP<KEY_TYPE, VALUE_TYPE, HASH>::LoadFactor(void) const
+float dsHASH_MAP<KEY_TYPE, VALUE_TYPE, HASH>::GetLoadFactor(void) const
 { 
    return (float)(mapTable.Size() / mapTable.Capacity());
 }

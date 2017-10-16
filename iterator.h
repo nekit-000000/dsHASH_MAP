@@ -25,7 +25,7 @@ public:
 
    dsHASH_MAP_CONST_ITERATOR (void);
    dsHASH_MAP_CONST_ITERATOR (const TABLE * table);
-   dsHASH_MAP_CONST_ITERATOR (const TABLE * table, const ELEM * p);
+   dsHASH_MAP_CONST_ITERATOR (const TABLE * table, const ELEM * p, size_t index);
    dsHASH_MAP_CONST_ITERATOR (const dsHASH_MAP_CONST_ITERATOR & it);
 
    ~dsHASH_MAP_CONST_ITERATOR (void) {}
@@ -59,7 +59,7 @@ public:
 
    dsHASH_MAP_ITERATOR (void);
    dsHASH_MAP_ITERATOR (TABLE * table);
-   dsHASH_MAP_ITERATOR (TABLE * table, ELEM * p);
+   dsHASH_MAP_ITERATOR (TABLE * table, ELEM * p, size_t index);
    dsHASH_MAP_ITERATOR (const dsHASH_MAP_CONST_ITERATOR<VALUE_TYPE> & it);
    dsHASH_MAP_ITERATOR (const dsHASH_MAP_ITERATOR & it);
 

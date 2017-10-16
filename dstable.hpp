@@ -55,7 +55,7 @@ typename dsTABLE<VALUE_TYPE>::dsTABLE_ELEM & dsTABLE<VALUE_TYPE>::dsTABLE_ELEM::
 template <typename VALUE_TYPE>
 typename dsTABLE<VALUE_TYPE>::ITERATOR dsTABLE<VALUE_TYPE>::End (void)
 {
-   return ITERATOR(this, NULL);
+   return ITERATOR(this, NULL, 0);
 }
 
 
@@ -72,7 +72,7 @@ typename dsTABLE<VALUE_TYPE>::ITERATOR dsTABLE<VALUE_TYPE>::Begin (void)
 template <typename VALUE_TYPE>
 typename dsTABLE<VALUE_TYPE>::CONST_ITERATOR dsTABLE<VALUE_TYPE>::End (void) const
 {
-   return CONST_ITERATOR(this, NULL);
+   return CONST_ITERATOR(this, NULL, 0);
 }
 
 
@@ -126,7 +126,8 @@ dsTABLE<VALUE_TYPE>::dsTABLE_ELEM::~dsTABLE_ELEM (void)
 
    while (pElem != this) {
       pElem = pElem->prev;
-      free(pElem->next);
+      delete pElem->next;
+      pElem->next = NULL;
    }
 }
 
@@ -181,23 +182,20 @@ dsTABLE<VALUE_TYPE>::dsTABLE (dsTABLE && constrTable)
 template <typename VALUE_TYPE>
 dsTABLE<VALUE_TYPE>::~dsTABLE (void)
 {
-   if (table == NULL) {
-      return;
-   }
-
-   for (size_t i = 0; i < capacity; i++) {
-      if (table[i] != NULL) {
-         delete table[i];
+   if (table != NULL) {
+      for (size_t i = 0; i < capacity; i++) {
+         if (table[i] != NULL) {
+            delete table[i];
+         }
       }
+      delete [] table;
    }
-
-   delete [] table;
 }
 
 
 template <typename VALUE_TYPE>
 typename dsTABLE<VALUE_TYPE>::ITERATOR 
-   dsTABLE<VALUE_TYPE>::Insert (const VALUE_TYPE & data, const int & index)
+   dsTABLE<VALUE_TYPE>::Insert (const VALUE_TYPE & data, size_t index)
 {
    if (index >= capacity) {
       return End();
@@ -206,7 +204,7 @@ typename dsTABLE<VALUE_TYPE>::ITERATOR
    size++;
    if (table[index] == NULL) {
       table[index] = new ELEM(data);
-      return ITERATOR(this, table[index]);
+      return ITERATOR(this, table[index], index);
    } else {
       ELEM * pElem = table[index];
 
@@ -218,7 +216,7 @@ typename dsTABLE<VALUE_TYPE>::ITERATOR
       pElem->next->next = NULL;
       pElem->next->prev = pElem;
 
-      return ITERATOR(this, pElem->next);
+      return ITERATOR(this, pElem->next, index);
    }
 }
 
@@ -232,7 +230,7 @@ typename dsTABLE<VALUE_TYPE>::ITERATOR
 
       while (pElem != NULL) {
          if (pElem->data == data) {
-            return ITERATOR(this, pElem);
+            return ITERATOR(this, pElem, i);
          }
 
          pElem = pElem->next;
@@ -246,31 +244,31 @@ typename dsTABLE<VALUE_TYPE>::ITERATOR
 
 template <typename VALUE_TYPE>
 typename dsTABLE<VALUE_TYPE>::ITERATOR
-dsTABLE<VALUE_TYPE>::Get (const int & index)
+dsTABLE<VALUE_TYPE>::Get (size_t index)
 {
    if ((size_t)index >= capacity) {
       return End();
    }
-   return ITERATOR(this, table[index]);
+   return ITERATOR(this, table[index], index);
 }
 
 
 
 template <typename VALUE_TYPE>
 typename dsTABLE<VALUE_TYPE>::CONST_ITERATOR
-dsTABLE<VALUE_TYPE>::Get (const int & index) const
+dsTABLE<VALUE_TYPE>::Get (size_t index) const
 {
    if ((size_t)index >= capacity) {
       return End();
    }
-   return CONST_ITERATOR(this, table[index]);
+   return CONST_ITERATOR(this, table[index], index);
 }
 
 
 /* Function returns ITERATOR of the last element in table[index] row */
 template <typename VALUE_TYPE>
 typename dsTABLE<VALUE_TYPE>::ITERATOR
-   dsTABLE<VALUE_TYPE>::GetLast (const int & index)
+   dsTABLE<VALUE_TYPE>::GetLast (size_t index)
 {
    if ((size_t)index >= capacity || table[index] == NULL) {
       return End();
@@ -281,15 +279,14 @@ typename dsTABLE<VALUE_TYPE>::ITERATOR
    while (p->next != NULL) {
       p = p->next;
    }
-   return ITERATOR(this, p);
+   return ITERATOR(this, p, index);
 }
-
 
 
 /* Function returns CONST_ITERATOR of the last element in table[index] row */
 template <typename VALUE_TYPE>
 typename dsTABLE<VALUE_TYPE>::CONST_ITERATOR
-   dsTABLE<VALUE_TYPE>::GetLast (const int & index) const
+   dsTABLE<VALUE_TYPE>::GetLast (size_t index) const
 {
    if ((size_t)index >= capacity || table[index] == NULL) {
       return End();
@@ -300,8 +297,23 @@ typename dsTABLE<VALUE_TYPE>::CONST_ITERATOR
    while (p->next != NULL) {
       p = p->next;
    }
-   return CONST_ITERATOR(this, p);
+   return CONST_ITERATOR(this, p, index);
 }
+
+
+template <typename VALUE_TYPE>
+bool  dsTABLE<VALUE_TYPE>::NextIsNull (CONST_ITERATOR & it) const
+{
+   return it.p->next == NULL;
+}
+
+
+template <typename VALUE_TYPE>
+bool  dsTABLE<VALUE_TYPE>::NextIsNull(ITERATOR & it) const
+{
+   return it.p->next == NULL;
+}
+
 
 
 template <typename VALUE_TYPE>
@@ -313,7 +325,7 @@ typename dsTABLE<VALUE_TYPE>::CONST_ITERATOR
 
       while (pElem != NULL) {
          if (pElem->data == data) {
-            return CONST_ITERATOR(this, pElem);
+            return CONST_ITERATOR(this, pElem, i);
          }
 
          pElem = pElem->next;
@@ -350,15 +362,17 @@ void dsTABLE<VALUE_TYPE>::Delete (ITERATOR & it)
    ELEM * p = it.p;
    if (p->next != NULL) {
       p->next->prev = p->prev;
+      p->next = NULL;
    }
 
    if (p->prev != NULL) {
       p->prev->next = p->next;
+      p->prev = NULL;
    } else {
       table[it.index] = NULL;
    }
 
-   free(p);
+   delete p;
 }
 
 

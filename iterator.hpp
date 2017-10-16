@@ -33,8 +33,8 @@ dsHASH_MAP_CONST_ITERATOR<VALUE_TYPE>::dsHASH_MAP_CONST_ITERATOR (const TABLE * 
 
 
 template <typename VALUE_TYPE>
-dsHASH_MAP_CONST_ITERATOR<VALUE_TYPE>::dsHASH_MAP_CONST_ITERATOR (const TABLE * table, const ELEM * p) :
-   p(p), pTable(table), index(0)
+dsHASH_MAP_CONST_ITERATOR<VALUE_TYPE>::dsHASH_MAP_CONST_ITERATOR (const TABLE * table, const ELEM * p, size_t index) :
+   p(p), pTable(table), index(index)
 {
 }
 
@@ -160,8 +160,8 @@ dsHASH_MAP_ITERATOR<VALUE_TYPE>::dsHASH_MAP_ITERATOR (TABLE * table) :
 
 
 template <typename VALUE_TYPE>
-dsHASH_MAP_ITERATOR<VALUE_TYPE>::dsHASH_MAP_ITERATOR (TABLE * table, ELEM * p) :
-   p(p), pTable(table), index(0)
+dsHASH_MAP_ITERATOR<VALUE_TYPE>::dsHASH_MAP_ITERATOR (TABLE * table, ELEM * p, size_t index) :
+   p(p), pTable(table), index(index)
 {
 }
 
